@@ -29,7 +29,7 @@ function testDbBase() {
   return { host: env.DB_HOST || '127.0.0.1', port: Number(env.DB_PORT || 3307), user: env.TEST_DB_USER, password: env.TEST_DB_PASSWORD };
 }
 
-export async function createTestEnv({ env = {}, interfaces = FAKE_INTERFACES } = {}) {
+export async function createTestEnv({ env = {}, interfaces = FAKE_INTERFACES, overrides = {} } = {}) {
   const name = `qrcard_test_${crypto.randomBytes(6).toString('hex')}`;
   const base = testDbBase();
   const admin = await mysql.createConnection(base);
@@ -40,7 +40,7 @@ export async function createTestEnv({ env = {}, interfaces = FAKE_INTERFACES } =
   const uploadDir = await fs.mkdtemp(path.join(os.tmpdir(), 'qrcard-uploads-'));
   const config = buildConfig(
     { ...env, PORT: env.PORT || '8080' },
-    { db, uploadDir, adminPasswordHash: TEST_HASH, sessionSecret: 'segreto-test', clientDist: path.join(uploadDir, 'nessun-dist') },
+    { db, uploadDir, adminPasswordHash: TEST_HASH, sessionSecret: 'segreto-test', clientDist: path.join(uploadDir, 'nessun-dist'), ...overrides },
   );
   const pool = createPool(db);
   const app = createApp({ pool, config, interfaces });

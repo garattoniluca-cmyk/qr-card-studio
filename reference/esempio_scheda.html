@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="it"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Card Studio - Gestionale Schede Prodotto</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=Roboto+Mono:wght@400;600&amp;family=Montserrat:wght@400;600;800&amp;display=swap" rel="stylesheet">
+    <!-- QRCode.js per generare QR Code istantanei -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* Stili per il contenuto formattato nell'editor e nella vista finale */
+        .rich-content h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.75rem; line-height: 1.2; }
+        .rich-content h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3; }
+        .rich-content h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .rich-content p { margin-bottom: 0.75rem; line-height: 1.6; }
+        .rich-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+        .rich-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+        .rich-content img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1rem auto; display: block; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .rich-content blockquote { border-left: 4px solid currentColor; padding-left: 1rem; font-style: italic; opacity: 0.85; margin: 1rem 0; }
+        .rich-content a { text-decoration: underline; font-weight: 500; }
+
+        /* Editor focus */
+        #richEditor:focus {
+            outline: 2px solid #6366f1;
+            outline-offset: -2px;
+        }
+
+        /* Regole di stampa per stampare solo la scheda o il cartellino QR */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printableArea, #printableArea * {
+                visibility: visible;
+            }
+            #printableArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 20px !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Scrollbar personalizzata */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c7c7cc; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.bottom-5{bottom:1.25rem}.left-3\.5{left:0.875rem}.right-5{right:1.25rem}.top-0{top:0px}.top-1\/2{top:50%}.z-30{z-index:30}.z-50{z-index:50}.z-10{z-index:10}.mx-1{margin-left:0.25rem;margin-right:0.25rem}.mx-auto{margin-left:auto;margin-right:auto}.my-8{margin-top:2rem;margin-bottom:2rem}.my-5{margin-top:1.25rem;margin-bottom:1.25rem}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.ml-auto{margin-left:auto}.mr-2{margin-right:0.5rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-0\.5{margin-top:0.125rem}.mt-8{margin-top:2rem}.line-clamp-1{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1}.line-clamp-2{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-10{height:2.5rem}.h-12{height:3rem}.h-16{height:4rem}.h-2{height:0.5rem}.h-5{height:1.25rem}.h-8{height:2rem}.h-9{height:2.25rem}.h-full{height:100%}.h-36{height:9rem}.max-h-\[500px\]{max-height:500px}.max-h-80{max-height:20rem}.min-h-\[260px\]{min-height:260px}.min-h-screen{min-height:100vh}.min-h-\[32px\]{min-height:32px}.w-12{width:3rem}.w-16{width:4rem}.w-2{width:0.5rem}.w-8{width:2rem}.w-9{width:2.25rem}.w-full{width:100%}.w-px{width:1px}.w-10{width:2.5rem}.min-w-\[260px\]{min-width:260px}.max-w-2xl{max-width:42rem}.max-w-7xl{max-width:80rem}.max-w-lg{max-width:32rem}.max-w-md{max-width:28rem}.max-w-sm{max-width:24rem}.max-w-\[220px\]{max-width:220px}.shrink-0{flex-shrink:0}.flex-grow{flex-grow:1}.-translate-y-1\/2{--tw-translate-y:-50%;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.translate-y-2{--tw-translate-y:0.5rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.cursor-pointer{cursor:pointer}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-end{align-items:flex-end}.items-center{align-items:center}.items-stretch{align-items:stretch}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-3 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.75rem * var(--tw-space-x-reverse));margin-left:calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.space-x-2\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.625rem * var(--tw-space-x-reverse));margin-left:calc(0.625rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-3\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.875rem * var(--tw-space-x-reverse));margin-left:calc(0.875rem * calc(1 - var(--tw-space-x-reverse)))}.self-start{align-self:flex-start}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.whitespace-nowrap{white-space:nowrap}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.rounded{border-radius:0.25rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-dashed{border-style:dashed}.border-amber-200{--tw-border-opacity:1;border-color:rgb(253 230 138 / var(--tw-border-opacity, 1))}.border-slate-100{--tw-border-opacity:1;border-color:rgb(241 245 249 / var(--tw-border-opacity, 1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-200\/60{border-color:rgb(226 232 240 / 0.6)}.border-slate-200\/80{border-color:rgb(226 232 240 / 0.8)}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.border-emerald-200{--tw-border-opacity:1;border-color:rgb(167 243 208 / var(--tw-border-opacity, 1))}.border-slate-200\/90{border-color:rgb(226 232 240 / 0.9)}.border-current{border-color:currentColor}.border-indigo-600{--tw-border-opacity:1;border-color:rgb(79 70 229 / var(--tw-border-opacity, 1))}.bg-amber-50{--tw-bg-opacity:1;background-color:rgb(255 251 235 / var(--tw-bg-opacity, 1))}.bg-amber-500{--tw-bg-opacity:1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}.bg-emerald-500{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-indigo-50{--tw-bg-opacity:1;background-color:rgb(238 242 255 / var(--tw-bg-opacity, 1))}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-rose-100{--tw-bg-opacity:1;background-color:rgb(255 228 230 / var(--tw-bg-opacity, 1))}.bg-rose-600{--tw-bg-opacity:1;background-color:rgb(225 29 72 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-300{--tw-bg-opacity:1;background-color:rgb(203 213 225 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-slate-900\/60{background-color:rgb(15 23 42 / 0.6)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-emerald-50{--tw-bg-opacity:1;background-color:rgb(236 253 245 / var(--tw-bg-opacity, 1))}.bg-rose-50{--tw-bg-opacity:1;background-color:rgb(255 241 242 / var(--tw-bg-opacity, 1))}.bg-slate-50\/60{background-color:rgb(248 250 252 / 0.6)}.bg-black\/5{background-color:rgb(0 0 0 / 0.05)}.bg-white\/90{background-color:rgb(255 255 255 / 0.9)}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.bg-gradient-to-t{background-image:linear-gradient(to top, var(--tw-gradient-stops))}.from-indigo-600{--tw-gradient-from:#4f46e5 var(--tw-gradient-from-position);--tw-gradient-to:rgb(79 70 229 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-slate-900\/80{--tw-gradient-from:rgb(15 23 42 / 0.8) var(--tw-gradient-from-position);--tw-gradient-to:rgb(15 23 42 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-slate-900\/30{--tw-gradient-to:rgb(15 23 42 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), rgb(15 23 42 / 0.3) var(--tw-gradient-via-position), var(--tw-gradient-to)}.to-violet-600{--tw-gradient-to:#7c3aed var(--tw-gradient-to-position)}.to-transparent{--tw-gradient-to:transparent var(--tw-gradient-to-position)}.bg-clip-text{-webkit-background-clip:text;background-clip:text}.object-cover{object-fit:cover}.p-1{padding:0.25rem}.p-12{padding:3rem}.p-2{padding:0.5rem}.p-2\.5{padding:0.625rem}.p-3\.5{padding:0.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.pl-9{padding-left:2.25rem}.pr-4{padding-right:1rem}.pt-2{padding-top:0.5rem}.pb-4{padding-bottom:1rem}.pt-1{padding-top:0.25rem}.pt-5{padding-top:1.25rem}.text-center{text-align:center}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-2xl{font-size:1.5rem;line-height:2rem}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.text-\[11px\]{font-size:11px}.text-\[9px\]{font-size:9px}.text-\[10px\]{font-size:10px}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.font-extrabold{font-weight:800}.uppercase{text-transform:uppercase}.leading-snug{line-height:1.375}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.tracking-wider{letter-spacing:0.05em}.tracking-tight{letter-spacing:-0.025em}.text-amber-700{--tw-text-opacity:1;color:rgb(180 83 9 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-indigo-700{--tw-text-opacity:1;color:rgb(67 56 202 / var(--tw-text-opacity, 1))}.text-rose-600{--tw-text-opacity:1;color:rgb(225 29 72 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-transparent{color:transparent}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-emerald-700{--tw-text-opacity:1;color:rgb(4 120 87 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.accent-indigo-600{accent-color:#4f46e5}.opacity-0{opacity:0}.opacity-85{opacity:0.85}.opacity-15{opacity:0.15}.opacity-75{opacity:0.75}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow{--tw-shadow:0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-inner{--tw-shadow:inset 0 2px 4px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:inset 0 2px 4px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-emerald-100{--tw-shadow-color:#d1fae5;--tw-shadow:var(--tw-shadow-colored)}.shadow-indigo-100{--tw-shadow-color:#e0e7ff;--tw-shadow:var(--tw-shadow-colored)}.shadow-indigo-200{--tw-shadow-color:#c7d2fe;--tw-shadow:var(--tw-shadow-colored)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.duration-200{transition-duration:200ms}.duration-500{transition-duration:500ms}.hover\:bg-amber-100:hover{--tw-bg-opacity:1;background-color:rgb(254 243 199 / var(--tw-bg-opacity, 1))}.hover\:bg-emerald-700:hover{--tw-bg-opacity:1;background-color:rgb(4 120 87 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-100:hover{--tw-bg-opacity:1;background-color:rgb(224 231 255 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-700:hover{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}.hover\:bg-rose-50:hover{--tw-bg-opacity:1;background-color:rgb(255 241 242 / var(--tw-bg-opacity, 1))}.hover\:bg-rose-700:hover{--tw-bg-opacity:1;background-color:rgb(190 18 60 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-100:hover{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-200:hover{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.hover\:bg-white:hover{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.hover\:bg-rose-100:hover{--tw-bg-opacity:1;background-color:rgb(255 228 230 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-50:hover{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.hover\:text-slate-600:hover{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.hover\:underline:hover{-webkit-text-decoration-line:underline;text-decoration-line:underline}.hover\:shadow-sm:hover{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.hover\:shadow-lg:hover{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.focus\:bg-white:focus{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-indigo-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(99 102 241 / var(--tw-ring-opacity, 1))}.group:hover .group-hover\:scale-105{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@media (min-width: 640px){.sm\:col-span-2{grid-column:span 2 / span 2}.sm\:block{display:block}.sm\:flex{display:flex}.sm\:max-w-\[260px\]{max-width:260px}.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.sm\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.sm\:flex-row{flex-direction:row}.sm\:items-center{align-items:center}.sm\:items-baseline{align-items:baseline}.sm\:p-8{padding:2rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:text-left{text-align:left}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}.sm\:text-base{font-size:1rem;line-height:1.5rem}}@media (min-width: 768px){.md\:inline{display:inline}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:items-center{align-items:center}}@media (min-width: 1024px){.lg\:sticky{position:sticky}.lg\:top-24{top:6rem}.lg\:col-span-5{grid-column:span 5 / span 5}.lg\:col-span-7{grid-column:span 7 / span 7}.lg\:grid-cols-12{grid-template-columns:repeat(12, minmax(0, 1fr))}.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:px-8{padding-left:2rem;padding-right:2rem}}</style></head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Barra di Navigazione Superiore -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 no-print shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.showDashboard()">
+                <div class="bg-indigo-600 text-white p-2.5 rounded-xl shadow-md shadow-indigo-200">
+                    <i class="fa-solid fa-qrcode text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">QR Card Studio</h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Gestionale Schede Prodotto &amp; QR Fisici</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <!-- Stato Connessione Cloud -->
+                <div id="authStatus" class="flex items-center space-x-2 text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Firestore Connesso</span></div>
+
+                <button onclick="app.showDashboard()" id="btnNavDashboard" class="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-table-cells-large"></i>
+                    <span class="hidden md:inline">Catalogo Schede</span>
+                </button>
+
+                <button onclick="app.openEditor()" class="px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-100 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Nuova Scheda</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenitore Principale -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- VISTA 1: DASHBOARD GESTIONALE (Elenco Schede) -->
+        <section id="viewDashboard" class="space-y-6 hidden">
+            <!-- Banner / Statistiche e Ricerca -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Archivio Schede Prodotto</h2>
+                    <p class="text-sm text-slate-500">Gestisci le tue schede, personalizza la grafica e stampa i QR Code da esporre.</p>
+                </div>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div class="relative min-w-[260px]">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="searchInput" oninput="app.renderDashboard()" placeholder="Cerca per nome, codice o categoria..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition">
+                    </div>
+                    <select id="categoryFilter" onchange="app.renderDashboard()" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"><option value="">Tutte le categorie (1)</option></select>
+                </div>
+            </div>
+
+            <!-- Griglia Schede -->
+            <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col justify-between overflow-hidden group">
+                        <div>
+                            <!-- Mini Anteprima Superiore con colore/immagine della scheda -->
+                            <div class="h-36 relative overflow-hidden flex items-end p-4" style="background-color: #ffffff; background: linear-gradient(135deg, #ffffff, #e0e7ff);">
+                                <img src="https://www.picturethisai.com/image-handle/website_cmsname/image/1080/347094560811679744.jpeg?x-oss-process=image/format,webp/resize,s_800&amp;v=1.0" class="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-105 transition duration-500" onerror="this.style.display='none'">
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent"></div>
+                                <div class="relative z-10 w-full flex items-end justify-between text-white">
+                                    <div>
+                                        
+                                        <h3 class="text-base font-bold leading-snug mt-1 line-clamp-1">Geranio</h3>
+                                    </div>
+                                    <span class="text-sm font-extrabold bg-white text-slate-900 px-2.5 py-1 rounded-lg shadow">345</span>
+                                </div>
+                            </div>
+
+                            <!-- Info sintetiche -->
+                            <div class="p-4">
+                                <p class="text-xs text-slate-500 line-clamp-2 min-h-[32px]">Nessun sottotitolo specificato.</p>
+                                <p class="text-[11px] font-mono text-slate-400 mt-2">SKU: 23434</p>
+                            </div>
+                        </div>
+
+                        <!-- Sezione QR Code Sempre Pronta in Fondo alla Card -->
+                        <div class="px-4 pb-4 pt-2 border-t border-slate-100 bg-slate-50/60 space-y-3">
+                            <div class="flex items-center justify-between gap-3 bg-white p-2.5 rounded-xl border border-slate-200/80">
+                                <div class="flex items-center space-x-2.5">
+                                    <div id="dash-qr-card-1792490803000" class="p-1 bg-white rounded border border-slate-100 shrink-0" title="blob:https://4k64wab5hb7261foutr7du7hngtyarheq2bsi4yihz2044tcxh-h998661601.scf.usercontent.goog/1a402fb5-3162-4dde-81c4-8d9896f4a219?cardId=card-1792490803000"><canvas width="64" height="64" style="display: none;"></canvas><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAH80lEQVR4AezYQY5lVxVEUasmAD0YA8x/KMyBJjMwXk/aX1HX92em5JaVttiKOHHivHJdpQvDj7/941+/fsSvl7/0xTTMMKd8lFGU39T+pN7msub1m8k/4scvv/31v//+55cbv61+95+///PfT0b3xmwhS9eXUeyOX/oWDXt3H1F3O+5u1HkewNBxKosyWvZV9YvrugWPPF3sIKMnZ97cr3P2zTqLLF4PUPBO/QKhw/soH+Yb9vrgweP0t1nmu/owgwe/e172Fb78AD4KH/WL8ilfntqF/Tv02+nnqR3k4DfPp/aoy3/Glx/gsw/9WfevB/Bqy7vfUK+tq0OjXWqP9tQMPsxwJ+NpyFHOw5zy7+g76faeB/CRG1s8j/XtKXjo0WiXltMzcytLdeJdZm9HwzfWm0/a/3D8ERX7gC4vT/N2POyQX+WxfTNk7qh5OTO93Z9e/zN+9BF6w0f3I83p7rq3O6lXXpeema7MDuvN9os97MCDv2EXr38EfFBIFx+Q0zCf2Mm65dFsj2Y7mCnyes2yE7vQhXl759xOrh/PAwi/K8+fAf3mvVKeeqUzO3MdbK9ZxruBmS72cqzXMX+ETrjP0+74RW95/gwQONgiX37uyuuY87duO2oPvjt+sYf9ydlr1v+q143nJ8DgOOVh9jfAU/Dg7Xnk5eaQw5zyOOduKeyjvpwHDx7blUe5mdfl8fwECCCgYe7go6wdvfXffUcfbqKZhvu8nhkyM13alZlhpnCH5yeghSBkvDK/3DJ7fWrPL7J2pzeHG367MsjAx3btor15fbM7/PXfAl7Hq8CL0DDbpzzsqZyPnfmlPkU371QnfEdvlYdOqrPIzRQ81n/4E7AfdwQf2JzH5nk5zN3ykOP09WjoQF/Gozm1QzO90a3d7x7AB2CZOggZmk91Bx3Ym8HLlnI7mE/kbugi05XRkMsoePDg4/lDUNhxWqaYbycLu5N2qzruNzPLo1mnjJrB64QM8kVWh5rDjPqvnwBBpVSG5lUfMVPw4PeGhx21j3ezbh1q/ozt8b594hsyqoPXAwi/I68H8BpeJzyGbJWPeml56nYpr0/taTTryijkceZmu+3lU3s0u4mf/k2w0hZ5dEDNOPs728d5o4fN697yetS+7jvVQ3se5tR38PwhuAseigr8Upbuzo35tjvzd1159zyaqTl8E82pTBcyGu3keH4CLC0WmYIs5U/0IKe6J3J7OcUtsy+nIXcTm/NyGmY3kNGwgxyvPwOESkKY6YmOHQUfZn0zBS+nzTzMJ3J98NBp5mXgy80hD1k+dRM/PYDyd+P1Z4DfuBei6IXozrweeHvwMp6akad2MvBhPtEv02vmlzqnftTxrXj+DFAWnB+5ZWdn575Do705n57f14E9DT1ezsfO9iGHHo32qz/9I2BRme7sY5DD7qPZDvV4d4vdzreOvZ4dbeZlzXlz6OTpdni8HuBWVoDjpS61x+5vvm47N1GWnrm5e1qPR/tyKgsz6ubNrwcQfkeePwS91Pmb9zpL++3yddrTzfPULvZuvZ65HjXL+ZSHefcy8yoP3ZTH8xPgwAAF8OChA35zM8rqyGC2o5AtMnvw4HVoyHHLddq1p9g8T+N5gD5QuGoHH4Md3cz8Lm9XXw/N7WX8Lbf7KG+vAzN4+C74zc3PAwgr0FCwwy3b3N4cZvgG5OY4Z7ketYMZMvByPsxyMw8zZJCFnJfjeQDGIuWxRTNkNNzgnGVx3myX315e7g4yCrkZPOTmEzl0YN/M4/UAhu/I2wc4X8qMfUkPZga/exnKKPQWmV60O3N7u813vuX2sEPf2Ox5AAsFWKIsT0/0w84NPdGR3fYye+jEmZ/77fH6dCmjuH3jeYCOKlU0w0zBg+9utR3F9syxN/l2bngKexp2kKd5M3RXeZ1yHs8DWFoIQhZlVA925jDDTHXAy/ilrL0ZOqkdzLEzX9+eDzsZLaMy8Hj+16BAkQqRX+WxXXPsnQ7KdMyLzH6xl6NcFmVUJ+xv/taT6eP5CejwO+rzAF6k37xXgWyVRz17noLfvTnam/moT0MnNnMjL6Nm8O3NeWq32JspngdgbvQBOx55H1nkIc/TZvd82J1s57azL+d9K+VDh6ehF2WvB7BwQMFD8Zzlsnd0Y1+XysMOZhrmG92n25F1T+3oiVwX7V4PUKiECnTnevQdbtrx7iEzo5mGPdrTRc9MF5m7MNs382GHds//H2C5YUtqR6MetaNhhu6ZmdvZQ0bDvoyasXvzomdPo/0560Wd109AwXfT5wF6FS+2D9BM49x3S3XsU14eZrs4Z3mZGz7sZOBh10xDfsNNtH8eoMEH8tSM9WYfoeCh8w577N5tlJv5lI/NeOzuK98/+26efxNk3uHIL9a+mcIOeT3+pM7mZ9dcL2/m4ZaGXVneHHr5Vbk+np8A5kZHDvJpGV36zvZkZj0a5Tvr4NxtJ6+HujzalzdTGXg8D8A4XGSLI2ym32wHGfgw10tlsVk3Zam8Pr9sR26uS82w21n2egDDd+QPP4BXhcfrdZtlaKZR3kxlvgE+2jWnejDTMLvBevsyOb78AI7DoQ+hjMrDjGa6897aQRZm/TC3O7Pd1ZHF9vPp6wE6TDumZdQMH6CfUY/u/e1OR07BY+/kZtiZUx7NVC+aU/nzAI5uKGJ3ZjiW8zDTE3k9utihjHdPF1kdPuqY81RXRsGHWaf5eYCGP6P+0b/n/wMAAP//TLsvNAAAAAZJREFUAwAwIjHS0wC1CwAAAABJRU5ErkJggg==" style="display: block;"></div>
+                                    <div class="text-xs">
+                                        <span class="font-bold text-slate-700 block">QR Code Pronto</span>
+                                        <span class="text-[11px] text-slate-400 block">Scansiona o stampa</span>
+                                        <button onclick="app.openPublicCardView('card-1792490803000')" class="mt-1 text-[11px] font-semibold text-indigo-600 hover:underline flex items-center gap-1">
+                                            <i class="fa-solid fa-up-right-from-square text-[9px]"></i> Apri vista esterna
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Azioni CRUD Gestionale -->
+                            <div class="grid grid-cols-3 gap-2 pt-1">
+                                <button onclick="app.openPublicCardView('card-1792490803000')" class="py-2 px-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition flex items-center justify-center gap-1.5" title="Visualizza e Stampa QR">
+                                    <i class="fa-solid fa-print"></i> Stampa
+                                </button>
+                                <button onclick="app.openEditor('card-1792490803000')" class="py-2 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition flex items-center justify-center gap-1.5" title="Modifica Scheda">
+                                    <i class="fa-regular fa-pen-to-square"></i> Modifica
+                                </button>
+                                <button onclick="app.requestDeleteCard('card-1792490803000')" class="py-2 px-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold transition flex items-center justify-center gap-1.5" title="Elimina Scheda">
+                                    <i class="fa-regular fa-trash-can"></i> Elimina
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center max-w-lg mx-auto my-8">
+                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 mb-1">Nessuna scheda prodotto trovata</h3>
+                <p class="text-sm text-slate-500 mb-6">Crea la tua prima scheda prodotto personalizzata con testo formattato, sfondi e QR Code automatico.</p>
+                <div class="flex justify-center gap-3">
+                    <button onclick="app.openEditor()" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition">
+                        <i class="fa-solid fa-plus mr-2"></i>Crea Prima Scheda
+                    </button>
+                    <button onclick="app.createDemoCard()" class="px-4 py-2.5 rounded-xl text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Carica Esempio
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA 2: EDITOR COMPLETO (Creazione / Modifica + Anteprima Live) -->
+        <section id="viewEditor" class="">
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex items-center space-x-3">
+                    <button onclick="app.showDashboard()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h2 id="editorModeTitle" class="text-lg font-bold text-slate-800">Modifica: Geranio</h2>
+                        <p class="text-xs text-slate-500">Modifica i contenuti a sinistra e osserva la scheda finale con QR Code a destra</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="app.showDashboard()" class="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 transition">
+                        Annulla
+                    </button>
+                    <button onclick="app.saveCard()" id="btnSaveCard" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-100 transition flex items-center space-x-2">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Salva nel Database</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- Colonna Sinistra: Controlli Editor (7 colonne su desktop) -->
+                <div class="lg:col-span-7 space-y-6">
+                    
+                    <!-- 1. Informazioni Principali -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-600 flex items-center gap-2">
+                            <i class="fa-solid fa-tag"></i> 1. Dati Principali Prodotto
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="sm:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Titolo Prodotto / Oggetto *</label>
+                                <input type="text" id="inpTitle" oninput="app.updateLivePreview()" placeholder="Es. Poltrona Artigianale Modello Nordico" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Sottotitolo / Breve Descrizione</label>
+                                <input type="text" id="inpSubtitle" oninput="app.updateLivePreview()" placeholder="Es. Collezione Autunno 2026 - Edizione Limitata" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Prezzo / Valore</label>
+                                    <input type="text" id="inpPrice" oninput="app.updateLivePreview()" placeholder="Es. € 249,00" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Codice / SKU</label>
+                                    <input type="text" id="inpSku" oninput="app.updateLivePreview()" placeholder="Es. ART-092" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Categoria / Reparto</label>
+                                <input type="text" id="inpCategory" oninput="app.updateLivePreview()" placeholder="Es. Arredamento, Elettronica, Museo..." class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">URL Immagine Principale (Copertina)</label>
+                                <input type="url" id="inpHeroImage" oninput="app.updateLivePreview()" placeholder="https://esempio.com/foto-prodotto.jpg" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Editor Testo Formattato (Rich Text) & Immagini -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-600 flex items-center gap-2">
+                                <i class="fa-solid fa-pen-ruler"></i> 2. Contenuto Formattato e Immagini
+                            </h3>
+                            <span class="text-xs text-slate-400">Seleziona il testo per formattarlo</span>
+                        </div>
+
+                        <!-- Barra degli Strumenti WYSIWYG -->
+                        <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 flex flex-wrap items-center gap-1">
+                            <!-- Titoli -->
+                            <button type="button" onclick="app.execCmd('formatBlock', 'H1')" title="Titolo Grande (H1)" class="px-2.5 py-1.5 rounded-lg hover:bg-white hover:shadow-sm text-xs font-bold text-slate-700 transition">H1</button>
+                            <button type="button" onclick="app.execCmd('formatBlock', 'H2')" title="Sottotitolo (H2)" class="px-2.5 py-1.5 rounded-lg hover:bg-white hover:shadow-sm text-xs font-bold text-slate-700 transition">H2</button>
+                            <button type="button" onclick="app.execCmd('formatBlock', 'H3')" title="Titolo Paragrafo (H3)" class="px-2.5 py-1.5 rounded-lg hover:bg-white hover:shadow-sm text-xs font-bold text-slate-700 transition">H3</button>
+                            <button type="button" onclick="app.execCmd('formatBlock', 'P')" title="Testo Normale" class="px-2.5 py-1.5 rounded-lg hover:bg-white hover:shadow-sm text-xs font-medium text-slate-700 transition">Paragrafo</button>
+                            
+                            <div class="h-5 w-px bg-slate-300 mx-1"></div>
+
+                            <!-- Stili base -->
+                            <button type="button" onclick="app.execCmd('bold')" title="Grassetto" class="w-8 h-8 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 transition"><i class="fa-solid fa-bold"></i></button>
+                            <button type="button" onclick="app.execCmd('italic')" title="Corsivo" class="w-8 h-8 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 transition"><i class="fa-solid fa-italic"></i></button>
+                            <button type="button" onclick="app.execCmd('underline')" title="Sottolineato" class="w-8 h-8 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 transition"><i class="fa-solid fa-underline"></i></button>
+                            <button type="button" onclick="app.execCmd('strikeThrough')" title="Barrato" class="w-8 h-8 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 transition"><i class="fa-solid fa-strikethrough"></i></button>
+
+                            <div class="h-5 w-px bg-slate-300 mx-1"></div>
+
+                            <!-- Colore Testo inline -->
+                            <label title="Colore Testo Selezionato" class="w-8 h-8 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 transition flex items-center justify-center cursor-pointer relative">
+                                <i class="fa-solid fa-palette text-sm"></i>
+                                <input type="color" onchange="app.execCmd('foreColor', this.value)" class="opacity-0 absolute inset-0 w-full h-full cursor-pointer">
+                            </label>
+
+                            <!-- Allineamento -->
+                            <button type="button" onclick="app.execCmd('justifyLeft')" title="Allinea a Sinistra" class="w-8 h-8 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 transition"><i class="fa-solid fa-align-left"></i></button>
+                            <button type="button" onclick="app.execCmd('justifyCenter')" title="Centra" class="w-8 h-8 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 transition"><i class="fa-solid fa-align-center"></i></button>
+                            <button type="button" onclick="app.execCmd('justifyRight')" title="Allinea a Destra" class="w-8 h-8 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 transition"><i class="fa-solid fa-align-right"></i></button>
+
+                            <div class="h-5 w-px bg-slate-300 mx-1"></div>
+
+                            <!-- Liste e Citazioni -->
+                            <button type="button" onclick="app.execCmd('insertUnorderedList')" title="Elenco Puntato" class="w-8 h-8 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 transition"><i class="fa-solid fa-list-ul"></i></button>
+                            <button type="button" onclick="app.execCmd('insertOrderedList')" title="Elenco Numerato" class="w-8 h-8 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 transition"><i class="fa-solid fa-list-ol"></i></button>
+                            <button type="button" onclick="app.execCmd('formatBlock', 'BLOCKQUOTE')" title="Citazione / Nota" class="w-8 h-8 rounded-lg hover:bg-white hover:shadow-sm text-slate-700 transition"><i class="fa-solid fa-quote-right"></i></button>
+
+                            <div class="h-5 w-px bg-slate-300 mx-1"></div>
+
+                            <!-- Inserimento Immagine via URL Esterno e Link -->
+                            <button type="button" onclick="app.openImageModal()" class="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition flex items-center gap-1.5">
+                                <i class="fa-regular fa-image"></i> + Immagine URL
+                            </button>
+                            <button type="button" onclick="app.openLinkModal()" class="px-2.5 py-1.5 rounded-lg hover:bg-white hover:shadow-sm text-xs font-medium text-slate-700 transition flex items-center gap-1">
+                                <i class="fa-solid fa-link"></i> Link
+                            </button>
+                            <button type="button" onclick="app.execCmd('removeFormat')" title="Pulisci Formattazione" class="w-8 h-8 rounded-lg hover:bg-rose-50 text-rose-600 transition ml-auto"><i class="fa-solid fa-eraser"></i></button>
+                        </div>
+
+                        <!-- Area Editabile -->
+                        <div id="richEditor" contenteditable="true" oninput="app.updateLivePreview()" class="rich-content min-h-[260px] max-h-[500px] overflow-y-auto p-4 bg-white border border-slate-200 rounded-xl text-sm"><h2>Descrizione Prodotto</h2><p>Scrivi qui i dettagli, la storia o le specifiche tecniche dell'oggetto fisico. Puoi aggiungere immagini tramite URL e personalizzare ogni aspetto grafico.</p><ul><li style="text-align: left;"><b>C<font color="#448d3f">aratteristica principale 1</font></b></li><li><font color="#448d3f"><b>Caratteristica principale 2</b></font></li></ul></div>
+                    </div>
+
+                    <!-- 3. Impostazioni Grafiche e Sfondi -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-indigo-600 flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> 3. Stile Grafico, Sfondi e Layout
+                        </h3>
+
+                        <!-- Tipo di Sfondo -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">Tipo di Sfondo della Scheda</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button type="button" onclick="app.setBgType('solid')" id="btnBgSolid" class="py-2 px-3 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 text-xs font-semibold flex items-center justify-center gap-2 transition">
+                                    <i class="fa-solid fa-fill-drip"></i> Tinta Unita
+                                </button>
+                                <button type="button" onclick="app.setBgType('gradient')" id="btnBgGradient" class="py-2 px-3 rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-700 text-xs font-bold flex items-center justify-center gap-2 transition">
+                                    <i class="fa-solid fa-swatchbook"></i> Gradiente
+                                </button>
+                                <button type="button" onclick="app.setBgType('image')" id="btnBgImage" class="py-2 px-3 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 text-xs font-semibold flex items-center justify-center gap-2 transition">
+                                    <i class="fa-regular fa-image"></i> Immagine URL
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Opzioni dinamiche Sfondo -->
+                        <div id="bgSolidControl" class="grid grid-cols-2 sm:grid-cols-4 gap-4 items-center">
+                            <div>
+                                <label class="block text-xs text-slate-500 mb-1">Colore Sfondo</label>
+                                <input type="color" id="inpBgColor1" value="#ffffff" oninput="app.updateLivePreview()" class="w-full h-10 rounded-lg cursor-pointer border border-slate-200 p-1">
+                            </div>
+                            <div id="bgGradientSecondColor" class="">
+                                <label class="block text-xs text-slate-500 mb-1">Secondo Colore</label>
+                                <input type="color" id="inpBgColor2" value="#e0e7ff" oninput="app.updateLivePreview()" class="w-full h-10 rounded-lg cursor-pointer border border-slate-200 p-1">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-500 mb-1">Colore Testo Scheda</label>
+                                <input type="color" id="inpTextColor" value="#1e293b" oninput="app.updateLivePreview()" class="w-full h-10 rounded-lg cursor-pointer border border-slate-200 p-1">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-500 mb-1">Colore Accento / Badge</label>
+                                <input type="color" id="inpAccentColor" value="#4f46e5" oninput="app.updateLivePreview()" class="w-full h-10 rounded-lg cursor-pointer border border-slate-200 p-1">
+                            </div>
+                        </div>
+
+                        <!-- Sfondo con Immagine URL -->
+                        <div id="bgImageControl" class="hidden space-y-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">URL Immagine di Sfondo</label>
+                                <input type="url" id="inpBgImageUrl" oninput="app.updateLivePreview()" placeholder="https://images.unsplash.com/photo-..." class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs text-slate-600 mb-1">
+                                    <span>Velo Scuro / Overlay (per leggibilità testo)</span>
+                                    <span id="lblOverlayVal">40%</span>
+                                </div>
+                                <input type="range" id="inpBgOverlay" min="0" max="90" value="40" oninput="document.getElementById('lblOverlayVal').innerText = this.value + '%'; app.updateLivePreview()" class="w-full accent-indigo-600">
+                            </div>
+                        </div>
+
+                        <!-- Font, Bordi, Allineamento -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Tipografia (Font)</label>
+                                <select id="inpFontFamily" onchange="app.updateLivePreview()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm">
+                                    <option value="'Inter', sans-serif">Moderno Sans (Inter)</option>
+                                    <option value="'Playfair Display', serif">Elegante Serif (Playfair)</option>
+                                    <option value="'Montserrat', sans-serif">Geometrico (Montserrat)</option>
+                                    <option value="'Roboto Mono', monospace">Tecnico Mono (Roboto)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Stile Bordi Scheda</label>
+                                <select id="inpBorderRadius" onchange="app.updateLivePreview()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm">
+                                    <option value="24px">Morbidi Arrotondati</option>
+                                    <option value="8px">Classici Leggeri</option>
+                                    <option value="0px">Squadrati Netti</option>
+                                    <option value="36px">Extra Capsule</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">URL Personalizzato QR (Opzionale)</label>
+                                <input type="url" id="inpCustomQrUrl" oninput="app.updateLivePreview()" placeholder="Lascia vuoto per URL diretto scheda" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm" title="Se lasci vuoto, il QR Code punterà automaticamente al link per aprire questa scheda">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Colonna Destra: Anteprima Live + QR Code Automatico in Fondo (5 colonne su desktop) -->
+                <div class="lg:col-span-5 lg:sticky lg:top-24 space-y-3">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Anteprima in Tempo Reale
+                        </span>
+                        <span class="text-xs text-slate-400">QR Code generato in automatico</span>
+                    </div>
+
+                    <!-- Contenitore Scheda Renderizzata -->
+                    <div id="livePreviewContainer" class="transition-all duration-300 shadow-xl overflow-hidden border border-slate-200/60" style="border-radius: 24px;">
+                <div style="background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%); color: #1e293b; font-family: 'Inter', sans-serif; border-radius: 24px;" class="p-6 sm:p-8 transition-all duration-300 flex flex-col justify-between">
+                    <div>
+                        <!-- Header Badge & SKU -->
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <span></span>
+                            <span class="text-xs font-mono opacity-75 px-2.5 py-1 rounded-lg bg-black/5">COD: 23434</span>
+                        </div>
+
+                        <!-- Titolo & Prezzo -->
+                        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-4">
+                            <div>
+                                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight">Geranio</h1>
+                                
+                            </div>
+                            <div style="color: #4f46e5;" class="text-2xl font-extrabold whitespace-nowrap bg-white/90 px-3.5 py-1.5 rounded-xl shadow-sm self-start">345</div>
+                        </div>
+
+                        <!-- Immagine Copertina (se presente) -->
+                        
+                            <div class="my-5 rounded-2xl overflow-hidden shadow-md bg-black/5">
+                                <img src="https://www.picturethisai.com/image-handle/website_cmsname/image/1080/347094560811679744.jpeg?x-oss-process=image/format,webp/resize,s_800&amp;v=1.0" alt="Geranio" class="w-full max-h-80 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/800x450/e2e8f0/64748b?text=Immagine+Non+Disponibile';">
+                            </div>
+                        
+
+                        <!-- Separatore -->
+                        <hr class="my-5 border-current opacity-15">
+
+                        <!-- Corpo Formattato Rich Text -->
+                        <div class="rich-content text-sm sm:text-base leading-relaxed">
+                            <h2>Descrizione Prodotto</h2><p>Scrivi qui i dettagli, la storia o le specifiche tecniche dell'oggetto fisico. Puoi aggiungere immagini tramite URL e personalizzare ogni aspetto grafico.</p><ul><li style="text-align: left;"><b>C<font color="#448d3f">aratteristica principale 1</font></b></li><li><font color="#448d3f"><b>Caratteristica principale 2</b></font></li></ul>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER SEMPRE PRESENTE CON QR CODE PRONTO DA STAMPARE / SCANSIONARE -->
+                    <div class="mt-8 pt-5 border-t border-current/15">
+                        <div class="bg-white text-slate-800 p-4 rounded-2xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 border border-slate-100">
+                            <div class="flex items-center space-x-3.5 text-center sm:text-left">
+                                <div style="background-color: #4f46e5;" class="w-10 h-10 rounded-xl text-white flex items-center justify-center shrink-0 shadow-sm hidden sm:flex">
+                                    <i class="fa-solid fa-qrcode text-lg"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 block">Scheda Digitale Prodotto</span>
+                                    <h4 class="text-sm font-bold text-slate-800">Geranio</h4>
+                                    <p class="text-xs text-slate-500 mt-0.5">Inquadra il QR Code per aprire questa scheda sul tuo smartphone</p>
+                                    <p class="text-[10px] font-mono text-slate-400 truncate max-w-[220px] sm:max-w-[260px] mt-1" title="blob:https://4k64wab5hb7261foutr7du7hngtyarheq2bsi4yihz2044tcxh-h998661601.scf.usercontent.goog/1a402fb5-3162-4dde-81c4-8d9896f4a219?cardId=card-1792490803000">blob:https://4k64wab5hb7261foutr7du7hngtyarheq2bsi4yihz2044tcxh-h998661601.scf.usercontent.goog/1a402fb5-3162-4dde-81c4-8d9896f4a219?cardId=card-1792490803000</p>
+                                </div>
+                            </div>
+                            <!-- Box QR Code -->
+                            <div class="bg-white p-2 rounded-xl border border-slate-200 shadow-inner shrink-0 flex flex-col items-center">
+                                <div id="livePreviewQrCode" title="blob:https://4k64wab5hb7261foutr7du7hngtyarheq2bsi4yihz2044tcxh-h998661601.scf.usercontent.goog/1a402fb5-3162-4dde-81c4-8d9896f4a219?cardId=card-1792490803000"><canvas width="105" height="105"></canvas><img style="display: none;"></div>
+                                <span class="text-[9px] font-mono font-semibold text-slate-400 mt-1">23434</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA 3: VISUALIZZAZIONE PUBBLICA / ESTERNA SCHEDA (Quando si apre da QR o link) -->
+        <section id="viewPublicCard" class="hidden max-w-2xl mx-auto space-y-6">
+            <!-- Barra di controllo (nascosta in stampa) -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3 no-print">
+                <button onclick="app.showDashboard()" class="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-100 transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Torna al Gestionale
+                </button>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="app.copyCardLink()" class="px-3.5 py-2 rounded-xl text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5">
+                        <i class="fa-regular fa-copy"></i> Copia Link
+                    </button>
+                    <button onclick="app.editCurrentPublicCard()" class="px-3.5 py-2 rounded-xl text-sm font-medium bg-amber-50 hover:bg-amber-100 text-amber-700 transition flex items-center gap-1.5">
+                        <i class="fa-regular fa-pen-to-square"></i> Modifica
+                    </button>
+                    <button onclick="window.print()" class="px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-print"></i> Stampa Scheda / QR
+                    </button>
+                </div>
+            </div>
+
+            <!-- Area Stampabile della Scheda -->
+            <div id="printableArea">
+                <div id="publicCardRender" class="shadow-2xl overflow-hidden"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODALE INSERIMENTO IMMAGINE DA URL ESTERNO NEL TESTO -->
+    <div id="modalImage" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-regular fa-image text-indigo-600"></i> Inserisci Immagine nel Testo
+                </h3>
+                <button onclick="app.closeModals()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-500">Incolla l'URL esterno dell'immagine che vuoi inserire nel corpo della scheda prodotto.</p>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">URL Immagine *</label>
+                <input type="url" id="modalInpImageUrl" placeholder="https://..." class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="app.closeModals()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100">Annulla</button>
+                <button onclick="app.confirmInsertImage()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white">Inserisci Immagine</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE INSERIMENTO LINK -->
+    <div id="modalLink" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-link text-indigo-600"></i> Inserisci Collegamento (Link)
+                </h3>
+                <button onclick="app.closeModals()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">URL Destinazione *</label>
+                <input type="url" id="modalInpLinkUrl" placeholder="https://..." class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="app.closeModals()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100">Annulla</button>
+                <button onclick="app.confirmInsertLink()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white">Inserisci Link</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE CONFERMA ELIMINAZIONE (Sostituisce confirm() nativo) -->
+    <div id="modalDelete" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4">
+            <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-slate-800">Eliminare questa scheda?</h3>
+                <p class="text-xs text-slate-500 mt-1">L'operazione rimuoverà definitivamente la scheda prodotto dal database Firestore e il relativo QR Code non sarà più associato.</p>
+            </div>
+            <div class="flex justify-center gap-3 pt-2">
+                <button onclick="app.closeModals()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">Annulla</button>
+                <button id="btnConfirmDelete" class="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-sm">Sì, Elimina</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICHE -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300 translate-y-2 opacity-0 no-print">
+        <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-sm">
+            <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span id="toastMsg">Operazione completata</span>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Configurazione e variabili di stato globali
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-qr-product-app';
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        let unsubscribeCards = null;
+
+        // Stato dell'applicazione
+        const state = {
+            cards: [],
+            editingCardId: null,
+            viewingCardId: null,
+            bgType: 'solid', // 'solid' | 'gradient' | 'image'
+            savedSelection: null
+        };
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMsg');
+            msg.textContent = message;
+            icon.className = isError 
+                ? 'fa-solid fa-triangle-exclamation text-rose-400' 
+                : 'fa-solid fa-circle-check text-emerald-400';
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3200);
+        }
+
+        // Genera l'URL esterno/pubblico che punta direttamente alla scheda
+        function getCardExternalUrl(cardId, customUrl = '') {
+            if (customUrl && customUrl.trim() !== '') {
+                return customUrl.trim();
+            }
+            const baseUrl = window.location.href.split('?')[0].split('#')[0];
+            return `${baseUrl}?cardId=${encodeURIComponent(cardId)}`;
+        }
+
+        // Genera un codice QR dentro un elemento DOM
+        function renderQrCode(element, urlText, size = 110) {
+            if (!element) return;
+            element.innerHTML = '';
+            try {
+                new QRCode(element, {
+                    text: urlText,
+                    width: size,
+                    height: size,
+                    colorDark: "#0f172a",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch (e) {
+                console.error("Errore generazione QR:", e);
+            }
+        }
+
+        async function initFirebase() {
+            const statusEl = document.getElementById('authStatus');
+            try {
+                if (typeof __firebase_config === 'undefined' || !__firebase_config) {
+                    statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span><span>Modalità Locale</span>`;
+                    checkUrlParameters();
+                    return;
+                }
+
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const firebaseApp = initializeApp(firebaseConfig);
+                auth = getAuth(firebaseApp);
+                db = getFirestore(firebaseApp);
+
+                // REGOLA 3: Autenticazione prima di ogni query
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    if (user) {
+                        statusEl.className = "flex items-center space-x-2 text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200";
+                        statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Firestore Connesso</span>`;
+                        startRealtimeListener();
+                    }
+                });
+            } catch (error) {
+                console.error("Errore inizializzazione Firebase:", error);
+                statusEl.className = "flex items-center space-x-2 text-xs font-medium px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200";
+                statusEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span>Errore Cloud</span>`;
+            }
+        }
+
+        // Ascolta in tempo reale la collezione pubblica delle schede
+        function startRealtimeListener() {
+            if (!currentUser || !db) return;
+
+            // REGOLA 1: Percorso rigoroso /artifacts/{appId}/public/data/product_cards
+            const cardsCol = collection(db, 'artifacts', appId, 'public', 'data', 'product_cards');
+
+            if (unsubscribeCards) unsubscribeCards();
+
+            // REGOLA 2: Nessuna query complessa, ordiniamo in memoria JS
+            unsubscribeCards = onSnapshot(cardsCol, (snapshot) => {
+                const loaded = [];
+                snapshot.forEach((docSnap) => {
+                    loaded.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                // Ordina per data di modifica decrescente in memoria
+                loaded.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+                state.cards = loaded;
+
+                updateCategoryFilterOptions();
+                renderDashboard();
+                checkUrlParameters();
+            }, (error) => {
+                console.error("Errore lettura schede da Firestore:", error);
+                showToast("Errore di sincronizzazione con il database", true);
+            });
+        }
+
+        // Controlla se l'URL ha ?cardId=... per mostrare subito la scheda scansionata dal QR
+        function checkUrlParameters() {
+            const params = new URLSearchParams(window.location.search);
+            const targetCardId = params.get('cardId');
+            if (targetCardId && state.cards.length > 0) {
+                const found = state.cards.find(c => c.id === targetCardId);
+                if (found) {
+                    openPublicCardView(found.id);
+                }
+            }
+        }
+
+        function buildCardHTML(cardData, qrContainerId) {
+            const {
+                id = 'preview-id',
+                title = 'Titolo Prodotto',
+                subtitle = '',
+                price = '',
+                sku = '',
+                category = '',
+                heroImage = '',
+                content = '',
+                bgType = 'solid',
+                bgColor1 = '#ffffff',
+                bgColor2 = '#e0e7ff',
+                bgImageUrl = '',
+                bgOverlay = 40,
+                textColor = '#1e293b',
+                accentColor = '#4f46e5',
+                fontFamily = "'Inter', sans-serif",
+                borderRadius = '24px',
+                customQrUrl = ''
+            } = cardData;
+
+            // Calcolo stile di sfondo
+            let bgStyle = `background-color: ${bgColor1};`;
+            if (bgType === 'gradient') {
+                bgStyle = `background: linear-gradient(135deg, ${bgColor1} 0%, ${bgColor2} 100%);`;
+            } else if (bgType === 'image' && bgImageUrl) {
+                const alpha = (Number(bgOverlay) || 0) / 100;
+                bgStyle = `background-image: linear-gradient(rgba(15, 23, 42, ${alpha}), rgba(15, 23, 42, ${alpha})), url('${bgImageUrl}'); background-size: cover; background-position: center;`;
+            }
+
+            const finalUrl = getCardExternalUrl(id, customQrUrl);
+
+            return `
+                <div style="${bgStyle} color: ${textColor}; font-family: ${fontFamily}; border-radius: ${borderRadius};" class="p-6 sm:p-8 transition-all duration-300 flex flex-col justify-between">
+                    <div>
+                        <!-- Header Badge & SKU -->
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            ${category ? `<span style="background-color: ${accentColor}; color: #ffffff;" class="px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm">${category}</span>` : '<span></span>'}
+                            ${sku ? `<span class="text-xs font-mono opacity-75 px-2.5 py-1 rounded-lg bg-black/5">COD: ${sku}</span>` : ''}
+                        </div>
+
+                        <!-- Titolo & Prezzo -->
+                        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-4">
+                            <div>
+                                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight">${title || 'Senza Titolo'}</h1>
+                                ${subtitle ? `<p class="text-sm sm:text-base opacity-80 mt-1 font-medium">${subtitle}</p>` : ''}
+                            </div>
+                            ${price ? `<div style="color: ${accentColor};" class="text-2xl font-extrabold whitespace-nowrap bg-white/90 px-3.5 py-1.5 rounded-xl shadow-sm self-start">${price}</div>` : ''}
+                        </div>
+
+                        <!-- Immagine Copertina (se presente) -->
+                        ${heroImage ? `
+                            <div class="my-5 rounded-2xl overflow-hidden shadow-md bg-black/5">
+                                <img src="${heroImage}" alt="${title}" class="w-full max-h-80 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/800x450/e2e8f0/64748b?text=Immagine+Non+Disponibile';">
+                            </div>
+                        ` : ''}
+
+                        <!-- Separatore -->
+                        <hr class="my-5 border-current opacity-15">
+
+                        <!-- Corpo Formattato Rich Text -->
+                        <div class="rich-content text-sm sm:text-base leading-relaxed">
+                            ${content || '<p class="opacity-60 italic">Nessuna descrizione inserita.</p>'}
+                        </div>
+                    </div>
+
+                    <!-- FOOTER SEMPRE PRESENTE CON QR CODE PRONTO DA STAMPARE / SCANSIONARE -->
+                    <div class="mt-8 pt-5 border-t border-current/15">
+                        <div class="bg-white text-slate-800 p-4 rounded-2xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 border border-slate-100">
+                            <div class="flex items-center space-x-3.5 text-center sm:text-left">
+                                <div style="background-color: ${accentColor};" class="w-10 h-10 rounded-xl text-white flex items-center justify-center shrink-0 shadow-sm hidden sm:flex">
+                                    <i class="fa-solid fa-qrcode text-lg"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 block">Scheda Digitale Prodotto</span>
+                                    <h4 class="text-sm font-bold text-slate-800">${title || 'Scheda Prodotto'}</h4>
+                                    <p class="text-xs text-slate-500 mt-0.5">Inquadra il QR Code per aprire questa scheda sul tuo smartphone</p>
+                                    <p class="text-[10px] font-mono text-slate-400 truncate max-w-[220px] sm:max-w-[260px] mt-1" title="${finalUrl}">${finalUrl}</p>
+                                </div>
+                            </div>
+                            <!-- Box QR Code -->
+                            <div class="bg-white p-2 rounded-xl border border-slate-200 shadow-inner shrink-0 flex flex-col items-center">
+                                <div id="${qrContainerId}"></div>
+                                <span class="text-[9px] font-mono font-semibold text-slate-400 mt-1">${sku || id.substring(0, 8)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateCategoryFilterOptions() {
+            const select = document.getElementById('categoryFilter');
+            const currentVal = select.value;
+            const categories = [...new Set(state.cards.map(c => c.category).filter(Boolean))];
+            select.innerHTML = `<option value="">Tutte le categorie (${state.cards.length})</option>` +
+                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            select.value = currentVal;
+        }
+
+        function renderDashboard() {
+            const grid = document.getElementById('cardsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const searchQuery = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+            const catFilter = document.getElementById('categoryFilter')?.value || '';
+
+            const filtered = state.cards.filter(card => {
+                const matchesSearch = !searchQuery ||
+                    (card.title || '').toLowerCase().includes(searchQuery) ||
+                    (card.subtitle || '').toLowerCase().includes(searchQuery) ||
+                    (card.sku || '').toLowerCase().includes(searchQuery) ||
+                    (card.category || '').toLowerCase().includes(searchQuery);
+                const matchesCat = !catFilter || card.category === catFilter;
+                return matchesSearch && matchesCat;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = filtered.map(card => {
+                const qrId = `dash-qr-${card.id}`;
+                return `
+                    <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col justify-between overflow-hidden group">
+                        <div>
+                            <!-- Mini Anteprima Superiore con colore/immagine della scheda -->
+                            <div class="h-36 relative overflow-hidden flex items-end p-4" style="background-color: ${card.bgColor1 || '#4f46e5'}; ${card.bgType === 'gradient' ? `background: linear-gradient(135deg, ${card.bgColor1}, ${card.bgColor2});` : ''}">
+                                ${card.heroImage ? `<img src="${card.heroImage}" class="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-105 transition duration-500" onerror="this.style.display='none'">` : ''}
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/30 to-transparent"></div>
+                                <div class="relative z-10 w-full flex items-end justify-between text-white">
+                                    <div>
+                                        ${card.category ? `<span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white/20 backdrop-blur-sm">${card.category}</span>` : ''}
+                                        <h3 class="text-base font-bold leading-snug mt-1 line-clamp-1">${card.title || 'Senza Titolo'}</h3>
+                                    </div>
+                                    ${card.price ? `<span class="text-sm font-extrabold bg-white text-slate-900 px-2.5 py-1 rounded-lg shadow">${card.price}</span>` : ''}
+                                </div>
+                            </div>
+
+                            <!-- Info sintetiche -->
+                            <div class="p-4">
+                                <p class="text-xs text-slate-500 line-clamp-2 min-h-[32px]">${card.subtitle || 'Nessun sottotitolo specificato.'}</p>
+                                ${card.sku ? `<p class="text-[11px] font-mono text-slate-400 mt-2">SKU: ${card.sku}</p>` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Sezione QR Code Sempre Pronta in Fondo alla Card -->
+                        <div class="px-4 pb-4 pt-2 border-t border-slate-100 bg-slate-50/60 space-y-3">
+                            <div class="flex items-center justify-between gap-3 bg-white p-2.5 rounded-xl border border-slate-200/80">
+                                <div class="flex items-center space-x-2.5">
+                                    <div id="${qrId}" class="p-1 bg-white rounded border border-slate-100 shrink-0"></div>
+                                    <div class="text-xs">
+                                        <span class="font-bold text-slate-700 block">QR Code Pronto</span>
+                                        <span class="text-[11px] text-slate-400 block">Scansiona o stampa</span>
+                                        <button onclick="app.openPublicCardView('${card.id}')" class="mt-1 text-[11px] font-semibold text-indigo-600 hover:underline flex items-center gap-1">
+                                            <i class="fa-solid fa-up-right-from-square text-[9px]"></i> Apri vista esterna
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Azioni CRUD Gestionale -->
+                            <div class="grid grid-cols-3 gap-2 pt-1">
+                                <button onclick="app.openPublicCardView('${card.id}')" class="py-2 px-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition flex items-center justify-center gap-1.5" title="Visualizza e Stampa QR">
+                                    <i class="fa-solid fa-print"></i> Stampa
+                                </button>
+                                <button onclick="app.openEditor('${card.id}')" class="py-2 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition flex items-center justify-center gap-1.5" title="Modifica Scheda">
+                                    <i class="fa-regular fa-pen-to-square"></i> Modifica
+                                </button>
+                                <button onclick="app.requestDeleteCard('${card.id}')" class="py-2 px-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold transition flex items-center justify-center gap-1.5" title="Elimina Scheda">
+                                    <i class="fa-regular fa-trash-can"></i> Elimina
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Genera i QR Code per ogni scheda renderizzata
+            filtered.forEach(card => {
+                const qrEl = document.getElementById(`dash-qr-${card.id}`);
+                const url = getCardExternalUrl(card.id, card.customQrUrl);
+                renderQrCode(qrEl, url, 64);
+            });
+        }
+
+        function getEditorFormData() {
+            const id = state.editingCardId || 'card-' + Date.now();
+            return {
+                id,
+                title: document.getElementById('inpTitle').value.trim(),
+                subtitle: document.getElementById('inpSubtitle').value.trim(),
+                price: document.getElementById('inpPrice').value.trim(),
+                sku: document.getElementById('inpSku').value.trim(),
+                category: document.getElementById('inpCategory').value.trim(),
+                heroImage: document.getElementById('inpHeroImage').value.trim(),
+                content: document.getElementById('richEditor').innerHTML,
+                bgType: state.bgType,
+                bgColor1: document.getElementById('inpBgColor1').value,
+                bgColor2: document.getElementById('inpBgColor2').value,
+                bgImageUrl: document.getElementById('inpBgImageUrl').value.trim(),
+                bgOverlay: Number(document.getElementById('inpBgOverlay').value),
+                textColor: document.getElementById('inpTextColor').value,
+                accentColor: document.getElementById('inpAccentColor').value,
+                fontFamily: document.getElementById('inpFontFamily').value,
+                borderRadius: document.getElementById('inpBorderRadius').value,
+                customQrUrl: document.getElementById('inpCustomQrUrl').value.trim()
+            };
+        }
+
+        function updateLivePreview() {
+            const data = getEditorFormData();
+            const container = document.getElementById('livePreviewContainer');
+            container.style.borderRadius = data.borderRadius;
+            container.innerHTML = buildCardHTML(data, 'livePreviewQrCode');
+
+            const qrEl = document.getElementById('livePreviewQrCode');
+            const targetUrl = getCardExternalUrl(data.id, data.customQrUrl);
+            renderQrCode(qrEl, targetUrl, 105);
+        }
+
+        function setBgType(type) {
+            state.bgType = type;
+            const btnSolid = document.getElementById('btnBgSolid');
+            const btnGrad = document.getElementById('btnBgGradient');
+            const btnImg = document.getElementById('btnBgImage');
+
+            const activeClass = "py-2 px-3 rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-700 text-xs font-bold flex items-center justify-center gap-2 transition";
+            const inactiveClass = "py-2 px-3 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 text-xs font-semibold flex items-center justify-center gap-2 transition";
+
+            btnSolid.className = type === 'solid' ? activeClass : inactiveClass;
+            btnGrad.className = type === 'gradient' ? activeClass : inactiveClass;
+            btnImg.className = type === 'image' ? activeClass : inactiveClass;
+
+            document.getElementById('bgGradientSecondColor').classList.toggle('hidden', type !== 'gradient');
+            document.getElementById('bgImageControl').classList.toggle('hidden', type !== 'image');
+
+            updateLivePreview();
+        }
+
+        function openEditor(cardId = null) {
+            hideAllViews();
+            document.getElementById('viewEditor').classList.remove('hidden');
+
+            if (cardId) {
+                const card = state.cards.find(c => c.id === cardId);
+                if (!card) return;
+                state.editingCardId = card.id;
+                document.getElementById('editorModeTitle').textContent = `Modifica: ${card.title}`;
+                document.getElementById('inpTitle').value = card.title || '';
+                document.getElementById('inpSubtitle').value = card.subtitle || '';
+                document.getElementById('inpPrice').value = card.price || '';
+                document.getElementById('inpSku').value = card.sku || '';
+                document.getElementById('inpCategory').value = card.category || '';
+                document.getElementById('inpHeroImage').value = card.heroImage || '';
+                document.getElementById('richEditor').innerHTML = card.content || '';
+                document.getElementById('inpBgColor1').value = card.bgColor1 || '#ffffff';
+                document.getElementById('inpBgColor2').value = card.bgColor2 || '#e0e7ff';
+                document.getElementById('inpBgImageUrl').value = card.bgImageUrl || '';
+                document.getElementById('inpBgOverlay').value = card.bgOverlay ?? 40;
+                document.getElementById('lblOverlayVal').innerText = (card.bgOverlay ?? 40) + '%';
+                document.getElementById('inpTextColor').value = card.textColor || '#1e293b';
+                document.getElementById('inpAccentColor').value = card.accentColor || '#4f46e5';
+                document.getElementById('inpFontFamily').value = card.fontFamily || "'Inter', sans-serif";
+                document.getElementById('inpBorderRadius').value = card.borderRadius || '24px';
+                document.getElementById('inpCustomQrUrl').value = card.customQrUrl || '';
+                setBgType(card.bgType || 'solid');
+            } else {
+                state.editingCardId = 'card-' + Date.now();
+                document.getElementById('editorModeTitle').textContent = 'Crea Nuova Scheda Prodotto';
+                document.getElementById('inpTitle').value = '';
+                document.getElementById('inpSubtitle').value = '';
+                document.getElementById('inpPrice').value = '';
+                document.getElementById('inpSku').value = '';
+                document.getElementById('inpCategory').value = '';
+                document.getElementById('inpHeroImage').value = '';
+                document.getElementById('richEditor').innerHTML = `<h2>Descrizione Prodotto</h2><p>Scrivi qui i dettagli, la storia o le specifiche tecniche dell'oggetto fisico. Puoi aggiungere immagini tramite URL e personalizzare ogni aspetto grafico.</p><ul><li>Caratteristica principale 1</li><li>Caratteristica principale 2</li></ul>`;
+                document.getElementById('inpBgColor1').value = '#ffffff';
+                document.getElementById('inpBgColor2').value = '#e0e7ff';
+                document.getElementById('inpBgImageUrl').value = '';
+                document.getElementById('inpBgOverlay').value = 40;
+                document.getElementById('inpTextColor').value = '#1e293b';
+                document.getElementById('inpAccentColor').value = '#4f46e5';
+                document.getElementById('inpFontFamily').value = "'Inter', sans-serif";
+                document.getElementById('inpBorderRadius').value = '24px';
+                document.getElementById('inpCustomQrUrl').value = '';
+                setBgType('solid');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function saveCard() {
+            const data = getEditorFormData();
+            if (!data.title) {
+                showToast("Inserisci almeno il titolo del prodotto", true);
+                document.getElementById('inpTitle').focus();
+                return;
+            }
+
+            const btn = document.getElementById('btnSaveCard');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i><span>Salvataggio...</span>`;
+
+            const payload = {
+                ...data,
+                updatedAt: Date.now(),
+                updatedBy: currentUser ? currentUser.uid : 'local-user'
+            };
+
+            try {
+                if (db && currentUser) {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'product_cards', data.id);
+                    await setDoc(docRef, payload);
+                } else {
+                    // Fallback in-memory se Firebase non è configurato nell'ambiente
+                    const idx = state.cards.findIndex(c => c.id === data.id);
+                    if (idx >= 0) state.cards[idx] = payload;
+                    else state.cards.unshift(payload);
+                    renderDashboard();
+                }
+                showToast("Scheda prodotto e QR Code salvati con successo!");
+                showDashboard();
+            } catch (error) {
+                console.error("Errore salvataggio scheda:", error);
+                showToast("Errore durante il salvataggio nel database", true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        function requestDeleteCard(cardId) {
+            const modal = document.getElementById('modalDelete');
+            modal.classList.remove('hidden');
+            const btnConfirm = document.getElementById('btnConfirmDelete');
+            btnConfirm.onclick = async () => {
+                closeModals();
+                try {
+                    if (db && currentUser) {
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'product_cards', cardId);
+                        await deleteDoc(docRef);
+                    } else {
+                        state.cards = state.cards.filter(c => c.id !== cardId);
+                        renderDashboard();
+                    }
+                    showToast("Scheda eliminata definitivamente");
+                } catch (err) {
+                    console.error("Errore eliminazione:", err);
+                    showToast("Impossibile eliminare la scheda", true);
+                }
+            };
+        }
+
+        async function createDemoCard() {
+            const demoId = 'card-demo-' + Date.now();
+            const demoPayload = {
+                id: demoId,
+                title: "Lampada da Tavolo 'Lumina'",
+                subtitle: "Design Italiano in Vetro Soffiato di Murano e Ottone",
+                price: "€ 320,00",
+                sku: "LUM-2026-IT",
+                category: "Illuminazione",
+                heroImage: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80",
+                content: `<h2>L'Arte della Luce</h2><p>La lampada <b>Lumina</b> nasce dall'incontro tra la lavorazione tradizionale del vetro e linee minimaliste contemporanee. Ideale per ambienti ricercati, studi professionali e zone living.</p><blockquote>Ogni pezzo è numerato e lavorato interamente a mano da maestri artigiani.</blockquote><h3>Specifiche Tecniche</h3><ul><li><b>Materiali:</b> Vetro opale triplo strato, base in ottone satinato</li><li><b>Sorgente Luminosa:</b> LED integrato dimmerabile 2700K (luce calda)</li><li><b>Dimensioni:</b> Altezza 42 cm × Diametro 26 cm</li></ul>`,
+                bgType: 'gradient',
+                bgColor1: '#ffffff',
+                bgColor2: '#f1f5f9',
+                bgImageUrl: '',
+                bgOverlay: 40,
+                textColor: '#0f172a',
+                accentColor: '#4f46e5',
+                fontFamily: "'Playfair Display', serif",
+                borderRadius: '24px',
+                customQrUrl: '',
+                updatedAt: Date.now()
+            };
+
+            try {
+                if (db && currentUser) {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'product_cards', demoId);
+                    await setDoc(docRef, demoPayload);
+                } else {
+                    state.cards.unshift(demoPayload);
+                    renderDashboard();
+                }
+                showToast("Scheda di esempio creata!");
+            } catch (e) {
+                console.error(e);
+                showToast("Errore creazione esempio", true);
+            }
+        }
+
+        function openPublicCardView(cardId) {
+            const card = state.cards.find(c => c.id === cardId);
+            if (!card) return;
+
+            state.viewingCardId = card.id;
+            hideAllViews();
+            document.getElementById('viewPublicCard').classList.remove('hidden');
+
+            const container = document.getElementById('publicCardRender');
+            container.style.borderRadius = card.borderRadius || '24px';
+            container.innerHTML = buildCardHTML(card, 'publicViewQrCode');
+
+            const qrEl = document.getElementById('publicViewQrCode');
+            const url = getCardExternalUrl(card.id, card.customQrUrl);
+            renderQrCode(qrEl, url, 115);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function hideAllViews() {
+            document.getElementById('viewDashboard').classList.add('hidden');
+            document.getElementById('viewEditor').classList.add('hidden');
+            document.getElementById('viewPublicCard').classList.add('hidden');
+        }
+
+        function showDashboard() {
+            hideAllViews();
+            document.getElementById('viewDashboard').classList.remove('hidden');
+            renderDashboard();
+        }
+
+        // Salva e ripristina la posizione del cursore nell'editor rich-text
+        function saveSelection() {
+            const sel = window.getSelection();
+            if (sel.getRangeAt && sel.rangeCount) {
+                state.savedSelection = sel.getRangeAt(0);
+            }
+        }
+
+        function restoreSelection() {
+            if (state.savedSelection) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(state.savedSelection);
+            }
+        }
+
+        function execCmd(command, value = null) {
+            document.getElementById('richEditor').focus();
+            document.execCommand(command, false, value);
+            updateLivePreview();
+        }
+
+        function openImageModal() {
+            saveSelection();
+            document.getElementById('modalInpImageUrl').value = '';
+            document.getElementById('modalImage').classList.remove('hidden');
+            document.getElementById('modalInpImageUrl').focus();
+        }
+
+        function confirmInsertImage() {
+            const url = document.getElementById('modalInpImageUrl').value.trim();
+            closeModals();
+            if (!url) return;
+            const editor = document.getElementById('richEditor');
+            editor.focus();
+            restoreSelection();
+            const imgHtml = `<img src="${url}" alt="Immagine Prodotto" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/64748b?text=Immagine+Non+Trovata';" />`;
+            document.execCommand('insertHTML', false, imgHtml);
+            updateLivePreview();
+        }
+
+        function openLinkModal() {
+            saveSelection();
+            document.getElementById('modalInpLinkUrl').value = '';
+            document.getElementById('modalLink').classList.remove('hidden');
+            document.getElementById('modalInpLinkUrl').focus();
+        }
+
+        function confirmInsertLink() {
+            const url = document.getElementById('modalInpLinkUrl').value.trim();
+            closeModals();
+            if (!url) return;
+            const editor = document.getElementById('richEditor');
+            editor.focus();
+            restoreSelection();
+            document.execCommand('createLink', false, url);
+            updateLivePreview();
+        }
+
+        function closeModals() {
+            document.getElementById('modalImage').classList.add('hidden');
+            document.getElementById('modalLink').classList.add('hidden');
+            document.getElementById('modalDelete').classList.add('hidden');
+        }
+
+        function copyCardLink() {
+            const card = state.cards.find(c => c.id === state.viewingCardId);
+            if (!card) return;
+            const url = getCardExternalUrl(card.id, card.customQrUrl);
+            const tempInput = document.createElement('input');
+            tempInput.value = url;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast("Link della scheda copiato negli appunti!");
+        }
+
+        // Espone le funzioni all'oggetto globale window.app
+        window.app = {
+            showDashboard,
+            openEditor,
+            saveCard,
+            requestDeleteCard,
+            createDemoCard,
+            openPublicCardView,
+            editCurrentPublicCard: () => openEditor(state.viewingCardId),
+            updateLivePreview,
+            setBgType,
+            execCmd,
+            openImageModal,
+            confirmInsertImage,
+            openLinkModal,
+            confirmInsertLink,
+            closeModals,
+            copyCardLink,
+            renderDashboard
+        };
+
+        // Avvio applicazione al caricamento
+        window.addEventListener('DOMContentLoaded', () => {
+            initFirebase();
+        });
+    </script>
+
+</body></html>

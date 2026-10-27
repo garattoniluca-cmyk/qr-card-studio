@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-100 font-sans text-slate-800 antialiased;
+  }
+}
+
+@layer components {
+  /* Contenuto formattato: stesso aspetto in editor, anteprima, vista pubblica e stampa. */
+  .rich-content h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+  .rich-content h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+  .rich-content h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  .rich-content p {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+  .rich-content li > p {
+    margin-bottom: 0.25rem;
+  }
+  .rich-content ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .rich-content ol {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .rich-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem auto;
+    display: block;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+  .rich-content blockquote {
+    border-left: 4px solid currentColor;
+    padding-left: 1rem;
+    font-style: italic;
+    opacity: 0.85;
+    margin: 1rem 0;
+  }
+  .rich-content a {
+    text-decoration: underline;
+    font-weight: 500;
+  }
+  .rich-content img.ProseMirror-selectednode {
+    outline: 3px solid #6366f1;
+  }
+  .ProseMirror:focus {
+    outline: none;
+  }
+
+  .field {
+    @apply w-full rounded-control border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500;
+  }
+  .field-label {
+    @apply mb-1 block text-xs font-semibold text-slate-600;
+  }
+  .panel {
+    @apply rounded-card border border-slate-200 bg-white shadow-sm;
+  }
+  .panel-title {
+    @apply flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-indigo-600;
+  }
+}
+
+/* Stampa: solo la scheda (o il cartellino), niente controlli del gestionale. */
+@media print {
+  @page {
+    margin: 10mm;
+  }
+  body {
+    background: #fff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-area {
+    box-shadow: none !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
+  .print-area * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print-avoid-break {
+    break-inside: avoid;
+  }
+}

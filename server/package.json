@@ -1,0 +1,26 @@
+{
+  "name": "@qrcard/server",
+  "version": "1.0.0-rc.1",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch-path=src src/index.js",
+    "start": "node src/index.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js",
+    "media:cleanup": "node scripts/media-cleanup.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^18.0.9",
+    "express": "^4.22.3",
+    "express-session": "^1.19.0",
+    "multer": "^2.5.0",
+    "mysql2": "^3.24.6",
+    "nanoid": "^6.0.2",
+    "qrcode": "^1.5.4",
+    "sanitize-html": "^2.18.1",
+    "sharp": "^0.35.5"
+  }
+}

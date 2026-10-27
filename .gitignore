@@ -1,0 +1,30 @@
+# Dipendenze e build
+node_modules/
+dist/
+.pw-browsers/
+
+# Configurazione locale e credenziali
+.env
+server/.env
+docs/local DBs.txt
+
+# Dati di runtime
+uploads/
+server/uploads/
+mysql/
+
+# Evidenze e report dei test (rigenerati da verify)
+test-results/
+playwright-report/
+.reports/
+
+# File di avvio del progetto che contengono credenziali in chiaro
+prompt-claude-code-qr-card-studio.md
+MYsql in locale- credenziali.png
+
+# Varie
+*.log
+.DS_Store
+Thumbs.db
+.vite/
+coverage/

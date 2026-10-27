@@ -1,0 +1,57 @@
+{
+  "name": "qr-card-studio",
+  "version": "1.0.0-rc.1",
+  "private": true,
+  "description": "QR Card Studio — gestionale di schede prodotto con QR Code",
+  "type": "module",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "concurrently -k -n server,client -c blue,magenta \"cross-env PORT=8080 PUBLIC_PORT=5173 npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "start": "npm run start -w server",
+    "migrate": "npm run migrate -w server",
+    "seed": "npm run seed -w server",
+    "media:cleanup": "npm run media:cleanup -w server --",
+    "lint": "eslint . --max-warnings 0 && prettier --check .",
+    "format": "prettier --write .",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "vitest run --config server/vitest.config.js && vitest run --config client/vitest.config.js",
+    "test:e2e": "playwright test",
+    "check-docs": "node scripts/check-docs.mjs",
+    "verify": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.64.1",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.6.2",
+    "concurrently": "^10.0.6",
+    "cross-env": "^10.1.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^17.13.0",
+    "jsdom": "^29.1.1",
+    "jsqr": "^1.4.0",
+    "pdfjs-dist": "^6.4.299",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0",
+    "postcss": "^8.5.32",
+    "prettier": "^3.9.10",
+    "supertest": "^7.3.1",
+    "tailwindcss": "^3.4.19",
+    "vite": "^6.4.5",
+    "vitest": "^5.0.5"
+  }
+}

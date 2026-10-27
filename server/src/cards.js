@@ -70,9 +70,7 @@ export async function listCardRows(pool, { q = '', category = '' } = {}) {
 }
 
 export async function listCategories(pool) {
-  const [rows] = await pool.query(
-    "SELECT category AS name, COUNT(*) AS count FROM cards WHERE category <> '' GROUP BY category ORDER BY category",
-  );
+  const [rows] = await pool.query("SELECT category AS name, COUNT(*) AS count FROM cards WHERE category <> '' GROUP BY category ORDER BY category");
   return rows.map((r) => ({ name: r.name, count: Number(r.count) }));
 }
 

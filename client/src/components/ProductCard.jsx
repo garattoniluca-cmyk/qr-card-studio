@@ -38,11 +38,7 @@ export function ProductCard({ card, heroUrl = null, bgUrl = null, qrSrc = null, 
   const title = card.title || 'Titolo della scheda';
 
   return (
-    <article
-      data-testid="product-card"
-      className="print-area overflow-hidden border border-slate-200/60 shadow-xl"
-      style={{ borderRadius: radius }}
-    >
+    <article data-testid="product-card" className="print-area overflow-hidden border border-slate-200/60 shadow-xl" style={{ borderRadius: radius }}>
       <div
         data-testid="product-card-body"
         className="flex flex-col justify-between p-6 sm:p-8"
@@ -70,7 +66,10 @@ export function ProductCard({ card, heroUrl = null, bgUrl = null, qrSrc = null, 
               {card.subtitle ? <p className="mt-1 text-sm opacity-80 sm:text-base">{card.subtitle}</p> : null}
             </div>
             {card.price ? (
-              <div className="self-start whitespace-nowrap rounded-xl bg-white/90 px-3.5 py-1.5 text-2xl font-extrabold shadow-sm" style={{ color: style.accentColor }}>
+              <div
+                className="self-start whitespace-nowrap rounded-xl bg-white/90 px-3.5 py-1.5 text-2xl font-extrabold shadow-sm"
+                style={{ color: style.accentColor }}
+              >
                 {card.price}
               </div>
             ) : null}
@@ -84,13 +83,23 @@ export function ProductCard({ card, heroUrl = null, bgUrl = null, qrSrc = null, 
 
           <hr className="my-5 border-current opacity-15" />
 
-          <div data-testid="card-content" className="rich-content break-words text-sm leading-relaxed sm:text-base" dangerouslySetInnerHTML={{ __html: html }} />
+          <div
+            data-testid="card-content"
+            className="rich-content break-words text-sm leading-relaxed sm:text-base"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
         </div>
 
         <footer className="print-avoid-break mt-8 border-t border-current/15 pt-5">
-          <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 text-slate-800 shadow-md sm:flex-row" style={{ fontFamily: FONT_FAMILIES.inter.css }}>
+          <div
+            className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 text-slate-800 shadow-md sm:flex-row"
+            style={{ fontFamily: FONT_FAMILIES.inter.css }}
+          >
             <div className="flex min-w-0 items-center gap-3.5 text-center sm:text-left">
-              <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm sm:flex" style={{ backgroundColor: style.accentColor }}>
+              <div
+                className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-sm sm:flex"
+                style={{ backgroundColor: style.accentColor }}
+              >
                 <QrCode aria-hidden="true" className="h-5 w-5" />
               </div>
               <div className="min-w-0">
@@ -110,7 +119,10 @@ export function ProductCard({ card, heroUrl = null, bgUrl = null, qrSrc = null, 
               {qrSrc ? (
                 <img data-testid="card-qr" src={qrSrc} alt="QR Code della scheda" width="112" height="112" className="h-28 w-28" />
               ) : (
-                <div data-testid="qr-placeholder" className="flex h-28 w-28 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 p-2 text-center text-[10px] font-medium leading-snug text-slate-500">
+                <div
+                  data-testid="qr-placeholder"
+                  className="flex h-28 w-28 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 p-2 text-center text-[10px] font-medium leading-snug text-slate-500"
+                >
                   QR disponibile dopo il salvataggio
                 </div>
               )}

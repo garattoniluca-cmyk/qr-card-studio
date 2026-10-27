@@ -1,0 +1,10 @@
+node_modules
+dist
+test-results
+.reports
+reference
+mysql
+server/uploads
+package-lock.json
+docs/local DBs.txt
+*.md

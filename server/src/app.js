@@ -67,9 +67,7 @@ export function createApp({ pool, config, interfaces }) {
     app.get(/^\/(admin)(\/.*)?$/, (req, res) => res.sendFile(indexHtml));
     app.get('*', (req, res) => res.status(404).sendFile(indexHtml));
   } else {
-    app.get('/', (req, res) =>
-      res.type('text/plain').send('QR Card Studio: client non buildato. Usa "npm run dev" oppure "npm run build".'),
-    );
+    app.get('/', (req, res) => res.type('text/plain').send('QR Card Studio: client non buildato. Usa "npm run dev" oppure "npm run build".'));
   }
 
   app.use(errorHandler);

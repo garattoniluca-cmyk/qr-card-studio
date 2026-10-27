@@ -1,12 +1,5 @@
 // Validazione dell'input delle schede e delle impostazioni.
-import {
-  BG_TYPES,
-  BORDER_RADII,
-  DEFAULT_STYLE,
-  FONT_FAMILIES,
-  HEX_COLOR,
-  LIMITS,
-} from '../../shared/card-options.js';
+import { BG_TYPES, BORDER_RADII, DEFAULT_STYLE, FONT_FAMILIES, HEX_COLOR, LIMITS } from '../../shared/card-options.js';
 import { HttpError } from './errors.js';
 
 const fail = (code, message) => {

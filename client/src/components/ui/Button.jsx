@@ -19,10 +19,7 @@ const SIZES = {
 };
 
 /** Pulsante del design system. `variant`: primary | success | secondary | soft | ghost | danger | danger-soft | warning */
-export const Button = forwardRef(function Button(
-  { variant = 'secondary', size = 'md', className = '', type = 'button', icon: Icon, children, ...rest },
-  ref,
-) {
+export const Button = forwardRef(function Button({ variant = 'secondary', size = 'md', className = '', type = 'button', icon: Icon, children, ...rest }, ref) {
   return (
     <button
       ref={ref}

@@ -24,14 +24,20 @@ export function QrTagPage() {
   return (
     <div className="mx-auto max-w-md p-4">
       <div className="no-print mb-4 flex items-center justify-between gap-2">
-        <Link to={`/admin/cards/${card.id}`} className="inline-flex items-center gap-2 rounded-control px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">
+        <Link
+          to={`/admin/cards/${card.id}`}
+          className="inline-flex items-center gap-2 rounded-control px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+        >
           <ArrowLeft aria-hidden="true" className="h-4 w-4" /> Torna all'editor
         </Link>
         <Button variant="primary" icon={Printer} onClick={() => window.print()}>
           Stampa cartellino
         </Button>
       </div>
-      <div data-testid="qr-tag" className="print-area print-avoid-break rounded-card border-2 border-dashed border-slate-300 bg-white p-6 text-center shadow-sm">
+      <div
+        data-testid="qr-tag"
+        className="print-area print-avoid-break rounded-card border-2 border-dashed border-slate-300 bg-white p-6 text-center shadow-sm"
+      >
         {card.category ? (
           <span className="inline-block rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider text-white" style={{ backgroundColor: accent }}>
             {card.category}
@@ -43,7 +49,12 @@ export function QrTagPage() {
             {card.price}
           </p>
         ) : null}
-        <img src={`/api/cards/${card.id}/qr.svg?size=640&v=${encodeURIComponent(card.updatedAt)}`} alt="QR Code" className="mx-auto mt-4 h-64 w-64" data-testid="tag-qr" />
+        <img
+          src={`/api/cards/${card.id}/qr.svg?size=640&v=${encodeURIComponent(card.updatedAt)}`}
+          alt="QR Code"
+          className="mx-auto mt-4 h-64 w-64"
+          data-testid="tag-qr"
+        />
         <p className="mt-2 text-sm font-semibold text-slate-700">Inquadra per la scheda completa</p>
         {card.sku ? <p className="mt-1 font-mono text-xs text-slate-400">COD: {card.sku}</p> : null}
         <p className="mt-2 break-all font-mono text-[10px] text-slate-400">{card.qrTarget}</p>

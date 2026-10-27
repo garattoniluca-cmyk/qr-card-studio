@@ -61,7 +61,7 @@ export function SettingsPage() {
       else {
         // Origine diversa senza CORS: si verifica almeno che l'host risponda.
         await fetch(target, { mode: 'no-cors', cache: 'no-store' });
-        setProbe({ state: 'ok', message: 'L\'host risponde (verifica completa possibile solo dalla stessa origine)' });
+        setProbe({ state: 'ok', message: "L'host risponde (verifica completa possibile solo dalla stessa origine)" });
       }
     } catch {
       setProbe({ state: 'fail', message: 'Non raggiungibile da questo browser' });
@@ -75,7 +75,8 @@ export function SettingsPage() {
           <Globe aria-hidden="true" className="h-4 w-4" /> URL pubblico dei QR
         </h2>
         <p className="text-sm text-slate-500">
-          Ogni QR codifica <span className="font-mono">URL pubblico + /p/codice</span>. Cambiando questo valore tutti i QR si aggiornano, senza modificare le schede.
+          Ogni QR codifica <span className="font-mono">URL pubblico + /p/codice</span>. Cambiando questo valore tutti i QR si aggiornano, senza modificare le
+          schede.
         </p>
         {info ? (
           <dl data-testid="effective-url" className="grid grid-cols-1 gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm sm:grid-cols-3">
@@ -118,7 +119,13 @@ export function SettingsPage() {
           <label htmlFor="publicBaseUrl" className="field-label">
             URL pubblico (vuoto = automatico)
           </label>
-          <input id="publicBaseUrl" className="field font-mono" placeholder="https://schede.esempio.it" value={value} onChange={(e) => setValue(e.target.value)} />
+          <input
+            id="publicBaseUrl"
+            className="field font-mono"
+            placeholder="https://schede.esempio.it"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
           {error ? (
             <p role="alert" className="mt-1 text-xs text-rose-600">
               {error}

@@ -17,18 +17,32 @@ const svg = (w, h, c1, c2, label) =>
   <rect x="${w * 0.18}" y="${h * 0.45}" width="${w * 0.42}" height="${h * 0.32}" rx="${h * 0.06}" fill="#0f172a" fill-opacity="0.25"/>
   <text x="50%" y="92%" font-family="Arial" font-size="${Math.round(h / 16)}" fill="#ffffff" text-anchor="middle">${label}</text></svg>`);
 
-await sharp(svg(1600, 1000, '#b45309', '#4f46e5', 'Poltrona Nordica')).jpeg({ quality: 82 }).toFile(path.join(seedDir, 'poltrona.jpg'));
-await sharp(svg(1200, 800, '#0f766e', '#a855f7', 'Dettaglio')).jpeg({ quality: 82 }).toFile(path.join(seedDir, 'dettaglio.jpg'));
+await sharp(svg(1600, 1000, '#b45309', '#4f46e5', 'Poltrona Nordica'))
+  .jpeg({ quality: 82 })
+  .toFile(path.join(seedDir, 'poltrona.jpg'));
+await sharp(svg(1200, 800, '#0f766e', '#a855f7', 'Dettaglio'))
+  .jpeg({ quality: 82 })
+  .toFile(path.join(seedDir, 'dettaglio.jpg'));
 
-await sharp(svg(800, 600, '#ef4444', '#3b82f6', 'jpeg')).jpeg().toFile(path.join(fxDir, 'foto.jpg'));
-await sharp(svg(640, 480, '#22c55e', '#0ea5e9', 'png')).png().toFile(path.join(fxDir, 'immagine.png'));
-await sharp(svg(500, 500, '#f59e0b', '#ec4899', 'webp')).webp().toFile(path.join(fxDir, 'immagine.webp'));
-await sharp(svg(5000, 2500, '#1e293b', '#6366f1', 'grande')).jpeg({ quality: 60 }).toFile(path.join(fxDir, 'grande-5000.jpg'));
+await sharp(svg(800, 600, '#ef4444', '#3b82f6', 'jpeg'))
+  .jpeg()
+  .toFile(path.join(fxDir, 'foto.jpg'));
+await sharp(svg(640, 480, '#22c55e', '#0ea5e9', 'png'))
+  .png()
+  .toFile(path.join(fxDir, 'immagine.png'));
+await sharp(svg(500, 500, '#f59e0b', '#ec4899', 'webp'))
+  .webp()
+  .toFile(path.join(fxDir, 'immagine.webp'));
+await sharp(svg(5000, 2500, '#1e293b', '#6366f1', 'grande'))
+  .jpeg({ quality: 60 })
+  .toFile(path.join(fxDir, 'grande-5000.jpg'));
 
 // GIF animata a 3 fotogrammi: tre riquadri impilati, letti come pagine.
 const frames = await Promise.all(
   ['#ef4444', '#22c55e', '#3b82f6'].map((c) =>
-    sharp({ create: { width: 120, height: 80, channels: 4, background: c } }).png().toBuffer(),
+    sharp({ create: { width: 120, height: 80, channels: 4, background: c } })
+      .png()
+      .toBuffer(),
   ),
 );
 const stacked = await sharp({ create: { width: 120, height: 240, channels: 4, background: '#000000' } })

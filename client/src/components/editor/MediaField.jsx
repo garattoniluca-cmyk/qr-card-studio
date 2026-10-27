@@ -26,7 +26,11 @@ export function MediaField({ id, label, media, onUpload, onRemove, onError }) {
       <span className="field-label">{label}</span>
       <div className="flex items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-2.5">
         <div className="flex h-16 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white">
-          {media ? <img data-testid={`${id}-preview`} src={media.url} alt="" className="h-full w-full object-cover" /> : <ImageUp aria-hidden="true" className="h-6 w-6 text-slate-300" />}
+          {media ? (
+            <img data-testid={`${id}-preview`} src={media.url} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <ImageUp aria-hidden="true" className="h-6 w-6 text-slate-300" />
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="soft" onClick={() => inputRef.current?.click()} disabled={busy} data-testid={`${id}-pick`}>
@@ -38,7 +42,15 @@ export function MediaField({ id, label, media, onUpload, onRemove, onError }) {
             </Button>
           ) : null}
         </div>
-        <input ref={inputRef} id={id} data-testid={`${id}-input`} type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={onPick} />
+        <input
+          ref={inputRef}
+          id={id}
+          data-testid={`${id}-input`}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          className="hidden"
+          onChange={onPick}
+        />
       </div>
     </div>
   );

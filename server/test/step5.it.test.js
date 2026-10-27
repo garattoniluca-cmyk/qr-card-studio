@@ -27,7 +27,7 @@ describe('@step5 @it QR e URL pubblico — integrazione', () => {
   });
   afterAll(async () => env?.cleanup());
 
-  it('T5.3 — qr.png contiene esattamente l\'URL canonico e rispetta size', async () => {
+  it("T5.3 — qr.png contiene esattamente l'URL canonico e rispetta size", async () => {
     const res = await agent.get(`/api/cards/${card.id}/qr.png?size=300`).buffer(true).expect(200);
     expect(res.headers['content-type']).toBe('image/png');
     const qr = await decodeQr(res.body);
@@ -37,7 +37,7 @@ describe('@step5 @it QR e URL pubblico — integrazione', () => {
     expect(small.width).toBe(200);
   });
 
-  it('T5.3 — qr.svg rasterizzato contiene l\'URL canonico e rispetta size', async () => {
+  it("T5.3 — qr.svg rasterizzato contiene l'URL canonico e rispetta size", async () => {
     const res = await agent.get(`/api/cards/${card.id}/qr.svg?size=400`).buffer(true).expect(200);
     expect(res.headers['content-type']).toMatch(/image\/svg\+xml/);
     expect(res.body.toString()).toMatch(/width="400"/);
@@ -45,8 +45,9 @@ describe('@step5 @it QR e URL pubblico — integrazione', () => {
     expect(qr.text).toBe(`http://192.168.1.20:8080/p/${card.publicId}`);
   });
 
-  it('T5.4 — con custom_qr_url valorizzato il QR codifica quell\'URL', async () => {
-    const other = (await agent.post('/api/cards').send({ title: 'Personalizzata', customQrUrl: 'https://negozio.example.com/prodotto?id=7' }).expect(201)).body.card;
+  it("T5.4 — con custom_qr_url valorizzato il QR codifica quell'URL", async () => {
+    const other = (await agent.post('/api/cards').send({ title: 'Personalizzata', customQrUrl: 'https://negozio.example.com/prodotto?id=7' }).expect(201)).body
+      .card;
     const qr = await decodeQr((await agent.get(`/api/cards/${other.id}/qr.png?size=300`).buffer(true)).body);
     expect(qr.text).toBe('https://negozio.example.com/prodotto?id=7');
     const svg = await decodeQr((await agent.get(`/api/cards/${other.id}/qr.svg?size=300`).buffer(true)).body);
@@ -58,7 +59,11 @@ describe('@step5 @it QR e URL pubblico — integrazione', () => {
 
     // 1) da env: stessa base dati, nuova istanza dell'app con PUBLIC_BASE_URL impostato
     const envApp = createApp({ pool: env.pool, config: { ...env.config, publicBaseUrlEnv: 'https://esempio.it' }, interfaces: FAKE_INTERFACES });
-    const cookie = (await request(envApp).post('/api/auth/login').send({ password: (await import('./helpers.js')).TEST_PASSWORD })).headers['set-cookie'];
+    const cookie = (
+      await request(envApp)
+        .post('/api/auth/login')
+        .send({ password: (await import('./helpers.js')).TEST_PASSWORD })
+    ).headers['set-cookie'];
     const fromEnv = await decodeQr((await request(envApp).get(`/api/cards/${card.id}/qr.png`).set('Cookie', cookie).buffer(true)).body);
     expect(fromEnv.text).toBe(`https://esempio.it/p/${card.publicId}`);
     const cfgEnv = await request(envApp).get('/api/config/public-base-url').expect(200);

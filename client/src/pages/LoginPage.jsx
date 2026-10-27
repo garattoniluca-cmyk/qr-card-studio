@@ -50,7 +50,16 @@ export function LoginPage() {
           <label htmlFor="password" className="field-label">
             Password amministratore
           </label>
-          <input id="password" type="password" autoComplete="current-password" required className="field" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />
+          <input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            required
+            className="field"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoFocus
+          />
         </div>
         {error ? (
           <p role="alert" className="rounded-control border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-600">

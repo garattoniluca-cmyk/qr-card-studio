@@ -72,7 +72,7 @@ test.describe('@step5 @e2e URL pubblico e QR', () => {
     await saveShot(page, 5, 'T5.8-cartellino.png');
   });
 
-  test('T5.8 — anteprima nell\'editor mostra il QR della scheda salvata', async ({ page }) => {
+  test("T5.8 — anteprima nell'editor mostra il QR della scheda salvata", async ({ page }) => {
     const card = await createCard(page, { title: 'Sedia', sku: 'SD-9' });
     await page.goto(`/admin/cards/${card.id}`);
     const qr = page.getByTestId('live-preview').getByTestId('card-qr');

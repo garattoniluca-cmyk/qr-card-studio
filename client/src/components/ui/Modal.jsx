@@ -52,7 +52,10 @@ export function Modal({ open, onClose, title, description, children, size = 'md'
   if (!open) return null;
   const width = size === 'sm' ? 'max-w-sm' : 'max-w-md';
   return createPortal(
-    <div className="no-print fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm" onMouseDown={(e) => e.target === e.currentTarget && onClose?.()}>
+    <div
+      className="no-print fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
+      onMouseDown={(e) => e.target === e.currentTarget && onClose?.()}
+    >
       <div
         ref={panelRef}
         role="dialog"

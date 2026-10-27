@@ -16,10 +16,7 @@ export function ToastProvider({ children, duration = 3200 }) {
     },
     [duration],
   );
-  const value = useMemo(
-    () => ({ success: (m) => show(m, { type: 'success' }), error: (m) => show(m, { type: 'error' }) }),
-    [show],
-  );
+  const value = useMemo(() => ({ success: (m) => show(m, { type: 'success' }), error: (m) => show(m, { type: 'error' }) }), [show]);
 
   return (
     <ToastContext.Provider value={value}>

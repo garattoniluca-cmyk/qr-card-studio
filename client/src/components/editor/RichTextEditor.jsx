@@ -74,7 +74,8 @@ export function RichTextEditor({ value, onChange, onUpload, onUploadError }) {
     immediatelyRender: true,
     editorProps: {
       attributes: {
-        class: 'rich-content min-h-[260px] max-h-[500px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 text-sm focus:outline-none focus-within:ring-2 focus-within:ring-indigo-500',
+        class:
+          'rich-content min-h-[260px] max-h-[500px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 text-sm focus:outline-none focus-within:ring-2 focus-within:ring-indigo-500',
         'data-testid': 'rich-editor',
         'aria-label': 'Contenuto della scheda',
         role: 'textbox',
@@ -186,7 +187,10 @@ export function RichTextEditor({ value, onChange, onUpload, onUploadError }) {
         <ToolButton id="strike" label="Barrato" active={st.strike} onClick={run('strike')}>
           <Strikethrough aria-hidden="true" className="h-4 w-4" />
         </ToolButton>
-        <label title="Colore del testo" className="relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-700 transition hover:bg-white hover:shadow-sm">
+        <label
+          title="Colore del testo"
+          className="relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-slate-700 transition hover:bg-white hover:shadow-sm"
+        >
           <Palette aria-hidden="true" className="h-4 w-4" style={{ color: st.color }} />
           <input
             type="color"
@@ -243,7 +247,12 @@ export function RichTextEditor({ value, onChange, onUpload, onUploadError }) {
       <EditorContent editor={editor} />
       <p className="text-xs text-slate-400">Puoi anche trascinare o incollare un'immagine nel testo: viene caricata sul server.</p>
 
-      <Modal open={linkOpen} onClose={() => setLinkOpen(false)} title="Inserisci collegamento" description="Lascia vuoto per rimuovere il collegamento dal testo selezionato.">
+      <Modal
+        open={linkOpen}
+        onClose={() => setLinkOpen(false)}
+        title="Inserisci collegamento"
+        description="Lascia vuoto per rimuovere il collegamento dal testo selezionato."
+      >
         <form onSubmit={confirmLink} className="space-y-4">
           <div>
             <label htmlFor="link-url" className="field-label">

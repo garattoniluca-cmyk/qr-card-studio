@@ -53,10 +53,7 @@ export async function getSetting(pool, key) {
 }
 
 export async function setSetting(pool, key, value) {
-  await pool.execute(
-    'INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)',
-    [key, value],
-  );
+  await pool.execute('INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)', [key, value]);
 }
 
 /** URL pubblico effettivo per la configurazione corrente. */

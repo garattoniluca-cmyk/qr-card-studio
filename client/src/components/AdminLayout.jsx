@@ -22,7 +22,9 @@ export function AdminLayout() {
               <QrCode aria-hidden="true" className="h-5 w-5" />
             </span>
             <span className="min-w-0">
-              <span className="block bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-lg font-bold text-transparent sm:text-xl">QR Card Studio</span>
+              <span className="block bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-lg font-bold text-transparent sm:text-xl">
+                QR Card Studio
+              </span>
               <span className="hidden text-xs text-slate-400 sm:block">Schede prodotto e QR fisici</span>
             </span>
           </Link>
